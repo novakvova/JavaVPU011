@@ -18,10 +18,20 @@ public class Main {
         //addQuestion();
         //showListQuestions();
         //addUserAndRole();
+        //AddCategoryProduct();
+        //addBasket();
+    }
+    private static void addBasket() {
         try (Session context = HibernateSessionFactoryUtil.getSessionFactory().openSession()) {
-
+            Transaction tx = context.beginTransaction();
+            var user = new User();
+            user.setId(1);
+            var product = new Product();
+            product.setId(1);
+            var basket = new Basket(product, user, 2);
+            context.save(basket);
+            tx.commit();
         }
-        AddCategoryProduct();
     }
     private static void AddCategoryProduct() {
         try (Session context = HibernateSessionFactoryUtil.getSessionFactory().openSession()) {

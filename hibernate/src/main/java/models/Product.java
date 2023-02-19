@@ -28,9 +28,12 @@ public class Product {
 
     @OneToMany(mappedBy="product")
     private List<ProductImage> productImages;
+    @OneToMany(mappedBy="product")
+    private List<Basket> baskets;
 
     public Product() {
         productImages=new ArrayList<>();
+        baskets = new ArrayList<>();
     }
 
     public Product(String name, double price, String description, Date dateCreated,
