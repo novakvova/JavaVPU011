@@ -3,9 +3,11 @@ package shop.storage;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -60,5 +62,53 @@ public class FileSystemStorageService implements StorageService {
         } catch(IOException e) {
             throw new StorageException("Проблема перетворення та збереження зображення base64",e);
         }
+    }
+
+    @Override
+    public String saveMultipartFile(MultipartFile file) {
+        try {
+            UUID uuid = UUID.randomUUID();
+            String extension="jpg";
+            String randomFileName = uuid.toString()+"."+extension;
+            Base64.Decoder decoder = Base64.getDecoder();
+            byte [] bytes = file.getBytes();
+            int [] imageSize = {32,150,300,600,1200};
+            try(var byteStream = new ByteArrayInputStream(bytes)) {
+                var image = ImageIO.read(byteStream);
+                for(int size: imageSize) {
+                    String fileSaveItem = rootLocation.toString()+"/"+size+"_"+randomFileName;
+                    BufferedImage newImg = ImageUtils.resizeImage(image,
+                            extension=="jpg"? ImageUtils.IMAGE_JPEG : ImageUtils.IMAGE_PNG,size, size);
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    ImageIO.write(newImg, extension, byteArrayOutputStream);
+                    byte [] newBytes = byteArrayOutputStream.toByteArray();
+                    FileOutputStream out = new FileOutputStream(fileSaveItem);
+                    out.write(newBytes);
+                    out.close();
+                }
+            } catch(IOException e) {
+                throw new StorageException("Зтискання фото проблема", e);
+            }
+            return randomFileName;
+        } catch(Exception ex) {
+            throw new StorageException("Помилка перетворення файлу", ex);
+        }
+    }
+
+    @Override
+    public void removeFile(String name) {
+        int [] imageSize = {32, 150, 300, 600, 1200};
+        for (int size : imageSize) {
+            Path filePath = load(size+"_"+name);
+            File file = new File(filePath.toString());
+            if (file.delete()) {
+                System.out.println(name + " Файл видалено.");
+            } else System.out.println(name + " Файл не знайдено.");
+        }
+    }
+
+    @Override
+    public Path load(String filename) {
+        return rootLocation.resolve(filename);
     }
 }

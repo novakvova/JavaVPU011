@@ -1,121 +1,159 @@
-const CategoryCreatePage = () => {
-  return (
-    <div className="mx-auto max-w-2xl text-center">
-        
-      <h1 className="text-2xl font-bold text-gray-900">Додати категорію</h1>
+import axios from "axios";
+import { ChangeEvent, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ICategoryCreate } from "../../home/types";
 
-      <form className="w-full">
-        <div className="flex flex-wrap -mx-3 mb-6">
-          <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-            <label
-              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              htmlFor="grid-first-name"
-            >
-              First Name
-            </label>
-            <input
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-              id="grid-first-name"
-              type="text"
-              placeholder="Jane"
-            />
-            <p className="text-red-500 text-xs italic">
-              Please fill out this field.
-            </p>
-          </div>
-          <div className="w-full md:w-1/2 px-3">
-            <label
-              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              htmlFor="grid-last-name"
-            >
-              Last Name
-            </label>
-            <input
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-              id="grid-last-name"
-              type="text"
-              placeholder="Doe"
-            />
-          </div>
-        </div>
-        <div className="flex flex-wrap -mx-3 mb-6">
-          <div className="w-full px-3">
-            <label
-              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              htmlFor="grid-password"
-            >
-              Password
-            </label>
-            <input
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-              id="grid-password"
-              type="password"
-              placeholder="******************"
-            />
-            <p className="text-gray-600 text-xs italic">
-              Make it as long and as crazy as you'd like
-            </p>
-          </div>
-        </div>
-        <div className="flex flex-wrap -mx-3 mb-2">
-          <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-            <label
-              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              htmlFor="grid-city"
-            >
-              City
-            </label>
-            <input
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-              id="grid-city"
-              type="text"
-              placeholder="Albuquerque"
-            />
-          </div>
-          <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-            <label
-              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              htmlFor="grid-state"
-            >
-              State
-            </label>
-            <div className="relative">
-              <select
-                className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                id="grid-state"
+const CategoryCreatePage = () => {
+  const navigator = useNavigate();
+
+  const [previewImage, setPreviewImage] = useState<string>("");
+
+  const [model, setModel] = useState<ICategoryCreate>({
+    name: "",
+    description: "",
+    file: null,
+  });
+
+  const onChangeHandler = (
+    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setModel({ ...model, [e.target.name]: e.target.value });
+  };
+
+  const onFileHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    const { target } = e;
+    const { files } = target;
+    if (files) {
+      const file = files[0];
+      setModel({...model, file});
+      setPreviewImage(URL.createObjectURL(file));
+      // const fileReader = new FileReader();
+      // fileReader.readAsDataURL(file);
+      // fileReader.onload = (readFile) => {
+      //   const result = readFile.target?.result as string;
+
+      //   setModel({ ...model, base64: result });
+      // };
+    }
+    target.value = "";
+  };
+
+  const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const item = await axios.post(
+        "http://localhost:8085/api/categories",
+        model, 
+        {
+          headers: {"Content-Type":"multipart/form-data"}
+        }
+      );
+      console.log("Server save category", item);
+      navigator("/");
+    } catch (error: any) {
+      console.log("Щось пішло не так", error);
+    }
+  };
+  return (
+    <>
+      <div className="p-8 rounded border border-gray-200">
+        <h1 className="font-medium text-3xl">Додати категорію</h1>
+
+        <form onSubmit={onSubmitHandler}>
+          <div className="mt-8 grid lg:grid-cols-1 gap-4">
+            <div>
+              <label
+                htmlFor="name"
+                className="text-sm text-gray-700 block mb-1 font-medium"
               >
-                <option>New Mexico</option>
-                <option>Missouri</option>
-                <option>Texas</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <svg
-                  className="fill-current h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
+                Назва
+              </label>
+              <input
+                type="text"
+                name="name"
+                onChange={onChangeHandler}
+                value={model.name}
+                id="name"
+                className="bg-gray-100 border border-gray-200 rounded py-1 px-3 block focus:ring-blue-500 focus:border-blue-500 text-gray-700 w-full"
+                placeholder="Вкажіть назву категорії"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="description"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Опис
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                onChange={onChangeHandler}
+                value={model.description}
+                rows={4}
+                className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Вкажіть опис..."
+              ></textarea>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Фото
+              </label>
+              <div className="mt-1 flex items-center">
+                <label
+                  htmlFor="selectImage"
+                  className="inline-block w-20 overflow-hidden bg-gray-100"
                 >
-                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                </svg>
+                  {previewImage === "" ? (
+                    <svg
+                      className="h-full w-full text-gray-300"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  ) : (
+                    <img src={previewImage} />
+                  )}
+                </label>
+                <label
+                  htmlFor="selectImage"
+                  className="ml-5 rounded-md border border-gray-300 bg-white 
+                        py-2 px-3 text-sm font-medium leading-4 text-gray-700 
+                        shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 
+                        focus:ring-indigo-500 focus:ring-offset-2"
+                >
+                  Обрати фото
+                </label>
               </div>
+              <input
+                type="file"
+                id="selectImage"
+                onChange={onFileHandler}
+                className="hidden"
+              />
             </div>
           </div>
-          <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-            <label
-              className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              htmlFor="grid-zip"
+          <div className="space-x-4 mt-8">
+            <button
+              type="submit"
+              className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 disabled:opacity-50"
             >
-              Zip
-            </label>
-            <input
-              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-              id="grid-zip"
-              type="text"
-              placeholder="90210"
-            />
+              Додати
+            </button>
+            <Link
+              to="/"
+              className="py-2 px-4 bg-white border border-gray-200 text-gray-600 rounded hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50"
+            >
+              На головну
+            </Link>
           </div>
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
+    </>
   );
 };
 

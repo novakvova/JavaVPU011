@@ -4,3 +4,9 @@ export interface ICategoryItem {
     image: string,
     description: string
 }
+
+export interface ICategoryCreate {
+    name: string;
+    file: File|null;
+    description: string;
+};
