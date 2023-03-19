@@ -70,6 +70,19 @@ const ProductCreatePage = () => {
     const contnetFiles = model.files.map((f, index) => {
       return (
         <div key={index} className="mb-4">
+          <div className="my-2">
+            <Link
+              to="#"
+              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              onClick={(e) => {
+                e.preventDefault();
+                setModel({...model, files: model.files.filter(x=>x!==f)})
+                console.log("click delete", f);
+              }}
+            >
+              Видалить
+            </Link>
+          </div>
           <img
             src={URL.createObjectURL(f)}
             className="h-auto max-w-full rounded-lg"
@@ -167,7 +180,7 @@ const ProductCreatePage = () => {
 
             <div>
 
-            <div className="grid grid-cols-12 items-center gap-4">
+            <div className="grid grid-cols-8 items-center gap-4">
              
              {contnetFiles}
              
