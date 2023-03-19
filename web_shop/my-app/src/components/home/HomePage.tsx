@@ -16,23 +16,39 @@ const HomePage = () => {
   }, []);
 
   const content = categories.map((category) => (
-    <div key={category.id} className="group relative">
-      <div className="relative h-80 w-full overflow-hidden rounded-lg bg-white group-hover:opacity-75 sm:aspect-w-2 sm:aspect-h-1 sm:h-64 lg:aspect-w-1 lg:aspect-h-1">
-        <img
-          src={"http://localhost:8085/files/600_" + category.image}
-          alt={category.name}
-          className="h-full w-full object-cover object-center"
-        />
+    <div key={category.id}>
+      <div className="group relative">
+        <div className="relative h-80 w-full overflow-hidden rounded-lg bg-white group-hover:opacity-75 sm:aspect-w-2 sm:aspect-h-1 sm:h-64 lg:aspect-w-1 lg:aspect-h-1">
+          <div className="main-slider">
+            <img
+              src={"http://localhost:8085/files/600_" + category.image}
+              alt={category.name}
+              className="picture-container"
+            />
+          </div>
+        </div>
+        <h3 className="mt-6 text-sm text-gray-500">
+          <a href="#">
+            <span className="absolute inset-0" />
+            {category.name}
+          </a>
+        </h3>
+        <p className="text-base font-semibold text-gray-900">
+          {category.description}
+        </p>
       </div>
-      <h3 className="mt-6 text-sm text-gray-500">
-        <a href="#">
-          <span className="absolute inset-0" />
-          {category.name}
-        </a>
-      </h3>
-      <p className="text-base font-semibold text-gray-900">
-        {category.description}
-      </p>
+      <div className="my-2">
+        <Link
+          to="#"
+          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+          onClick={(e) => {
+            e.preventDefault();
+            console.log("click delete", category.id);
+          }}
+        >
+          Видалить
+        </Link>
+      </div>
     </div>
   ));
 
@@ -49,6 +65,15 @@ const HomePage = () => {
                 className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
               >
                 Додати категорію
+              </Link>
+            </div>
+
+            <div className="py-2">
+              <Link
+                to="/products/create"
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              >
+                Додати продукт
               </Link>
             </div>
 
